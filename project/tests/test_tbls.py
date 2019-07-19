@@ -218,8 +218,21 @@ class TestService(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('Object successfully deleted', data['meta']['message'])
 
-    def test_add_task(self):
-        with self.client:
+    def test_persons_id_tasks_get(self):
+            response = self.client.post(
+                '/persons',
+                data=json.dumps({
+                    'data': {
+                        'type': 'person',
+                        'attributes': {
+                            'name': 'Ren Hoek'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
             response = self.client.post(
                 '/tasks',
                 data=json.dumps({
@@ -234,10 +247,60 @@ class TestService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
+            response = self.client.post(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [
+                        {
+                            'type': 'task',
+                            'id': '1'
+                        }
+                    ]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(f'/persons/1/tasks')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('task', data['data'][0]['type'])
+            self.assertIn('1', data['data'][0]['id'])
+
+    def test_persons_id_tasks_post(self):
+        with self.client:
+            response = self.client.post(
+                '/persons',
+                data=json.dumps({
+                    'data': {
+                        'type': 'person',
+                        'attributes': {
+                            'name': 'Ren Hoek'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
+            response = self.client.post(
+                '/persons/1/tasks',
+                data=json.dumps({
+                    'data': {
+                        'type': 'task',
+                        'attributes': {
+                            'what': 'do nothing'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
             self.assertIn('do nothing', data['data']['attributes']['what'])
 
-
-    def test_add_person_rel_task(self):
+    def test_persons_id_rel_tasks_get(self):
         with self.client:
             response = self.client.post(
                 '/persons',
@@ -279,8 +342,29 @@ class TestService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
-            self.assertIn('Relationship successfully created', data['meta']['message'])
+            response = self.client.get(f'/persons/1/relationships/tasks')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('task', data['data'][0]['type'])
+            self.assertEqual(1, data['data'][0]['id'])
 
+    def test_tasks_get(self):
+        with self.client:
+            response = self.client.post(
+                '/tasks',
+                data=json.dumps({
+                    'data': {
+                        'type': 'task',
+                        'attributes': {
+                            'what': 'do nothing'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            self.assertIn('do nothing', data['data']['attributes']['what'])
 
 if __name__ == '__main__':
     unittest.main()
