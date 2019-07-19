@@ -44,6 +44,34 @@ class TestService(BaseTestCase):
     def test_add_person_rel_task(self):
         with self.client:
             response = self.client.post(
+                '/persons',
+                data=json.dumps({
+                    'data': {
+                        'type': 'person',
+                        'attributes': {
+                            'name': 'Ren Hoek'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.post(
+                '/tasks',
+                data=json.dumps({
+                    'data': {
+                        'type': 'task',
+                        'attributes': {
+                            'what': 'do nothing'
+                        }
+                    }
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.post(
                 '/persons/1/relationships/tasks',
                 data=json.dumps({
                     'data': [{
