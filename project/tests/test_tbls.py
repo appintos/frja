@@ -3,20 +3,39 @@ import unittest
 from project.tests.base import BaseTestCase
 
 
+def person_post(self):
+    response = self.client.post(
+        '/persons',
+        data=json.dumps({
+            'data': {
+                'type': 'person',
+                'attributes': {
+                    'name': 'Ren Hoek'
+                }
+            }
+        }),
+        content_type='application/json',
+    )
+    return response
+
+def task_post(self):
+    response = self.client.post(
+        '/tasks',
+        data=json.dumps({
+            'data': {
+                'type': 'task',
+                'attributes': {
+                    'what': 'do nothing'
+                }
+            }
+        }),
+        content_type='application/json',
+    )
+    return response
+
 class TestService(BaseTestCase):
     def test_persons_get(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.get(f'/persons')
@@ -28,36 +47,14 @@ class TestService(BaseTestCase):
 
     def test_persons_post(self):
         with self.client:
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
 
     def test_persons_tasks_post(self):
         with self.client:
-            response = self.client.post(
-                '/tasks',
-                data=json.dumps({
-                    'data': {
-                        'type': 'task',
-                        'attributes': {
-                            'what': 'do nothing'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = task_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -85,18 +82,7 @@ class TestService(BaseTestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_persons_id_get(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.get(f'/persons/1')
@@ -107,18 +93,7 @@ class TestService(BaseTestCase):
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_patch(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.patch(
@@ -141,32 +116,10 @@ class TestService(BaseTestCase):
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_tasks_patch(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = self.client.post(
-                '/tasks',
-                data=json.dumps({
-                    'data': {
-                        'type': 'task',
-                        'attributes': {
-                            'what': 'do nothing'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = task_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.patch(
@@ -199,18 +152,7 @@ class TestService(BaseTestCase):
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_delete(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.delete(f'/persons/1')
@@ -219,32 +161,10 @@ class TestService(BaseTestCase):
             self.assertIn('Object successfully deleted', data['meta']['message'])
 
     def test_persons_id_tasks_get(self):
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = self.client.post(
-                '/tasks',
-                data=json.dumps({
-                    'data': {
-                        'type': 'task',
-                        'attributes': {
-                            'what': 'do nothing'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = task_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -269,18 +189,7 @@ class TestService(BaseTestCase):
 
     def test_persons_id_tasks_post(self):
         with self.client:
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
@@ -302,32 +211,10 @@ class TestService(BaseTestCase):
 
     def test_persons_id_rel_tasks_get(self):
         with self.client:
-            response = self.client.post(
-                '/persons',
-                data=json.dumps({
-                    'data': {
-                        'type': 'person',
-                        'attributes': {
-                            'name': 'Ren Hoek'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = person_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = self.client.post(
-                '/tasks',
-                data=json.dumps({
-                    'data': {
-                        'type': 'task',
-                        'attributes': {
-                            'what': 'do nothing'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = task_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -350,18 +237,7 @@ class TestService(BaseTestCase):
 
     def test_tasks_get(self):
         with self.client:
-            response = self.client.post(
-                '/tasks',
-                data=json.dumps({
-                    'data': {
-                        'type': 'task',
-                        'attributes': {
-                            'what': 'do nothing'
-                        }
-                    }
-                }),
-                content_type='application/json',
-            )
+            response = task_post(self)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             self.assertIn('do nothing', data['data']['attributes']['what'])
