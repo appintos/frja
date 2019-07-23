@@ -248,6 +248,118 @@ class TestService(BaseTestCase):
             self.assertIn('task', data['data'][0]['type'])
             self.assertEqual(1, data['data'][0]['id'])
 
+    def test_persons_id_rel_tasks_post(self):
+        with self.client:
+            name = 'Ren Hoek'
+            response = person_post(self, name)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            what = 'do nothing'
+            response = task_post(self, what)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.post(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [{
+                        'type': 'task',
+                        'id': '1'
+                    }]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+
+    def test_persons_id_rel_tasks_patch(self):
+        with self.client:
+            name = 'Ren Hoek'
+            response = person_post(self, name)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            what = 'do nothing'
+            response = task_post(self, what)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.post(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [{
+                        'type': 'task',
+                        'id': '1'
+                    }]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(f'/persons/1/relationships/tasks')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('task', data['data'][0]['type'])
+            self.assertEqual(1, data['data'][0]['id'])
+            what = 'do something'
+            response = task_post(self, what)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.patch(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [{
+                        'type': 'task',
+                        'id': '2'
+                    }]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(f'/persons/1/relationships/tasks')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('task', data['data'][0]['type'])
+            self.assertEqual(2, data['data'][0]['id'])
+
+    def test_persons_id_rel_tasks_delete(self):
+        with self.client:
+            name = 'Ren Hoek'
+            response = person_post(self, name)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            what = 'do nothing'
+            response = task_post(self, what)
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            response = self.client.post(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [{
+                        'type': 'task',
+                        'id': '1'
+                    }]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get(f'/persons/1/relationships/tasks')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('task', data['data'][0]['type'])
+            self.assertEqual(1, data['data'][0]['id'])
+            response = self.client.delete(
+                '/persons/1/relationships/tasks',
+                data=json.dumps({
+                    'data': [{
+                        'type': 'task',
+                        'id': '1'
+                    }]
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+
     def test_tasks_get(self):
         with self.client:
             what = 'do nothing'
