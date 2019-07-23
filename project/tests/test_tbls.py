@@ -3,14 +3,14 @@ import unittest
 from project.tests.base import BaseTestCase
 
 
-def person_post(self):
+def person_post(self, name):
     response = self.client.post(
         '/persons',
         data=json.dumps({
             'data': {
                 'type': 'person',
                 'attributes': {
-                    'name': 'Ren Hoek'
+                    'name': name 
                 }
             }
         }),
@@ -18,14 +18,14 @@ def person_post(self):
     )
     return response
 
-def task_post(self):
+def task_post(self, what):
     response = self.client.post(
         '/tasks',
         data=json.dumps({
             'data': {
                 'type': 'task',
                 'attributes': {
-                    'what': 'do nothing'
+                    'what': what 
                 }
             }
         }),
@@ -35,26 +35,29 @@ def task_post(self):
 
 class TestService(BaseTestCase):
     def test_persons_get(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.get(f'/persons')
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
             self.assertIn('person', data['data'][0]['type'])
-            self.assertIn('REN HOEK', data['data'][0]['attributes']['display_name'])
+            self.assertIn(name.upper(), data['data'][0]['attributes']['display_name'])
             self.assertIn('1', data['data'][0]['id'])
 
     def test_persons_post(self):
         with self.client:
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
+            self.assertIn(name.upper(), data['data']['attributes']['display_name'])
 
     def test_persons_tasks_post(self):
         with self.client:
-            response = task_post(self)
+            what = 'do nothing'
+            response = task_post(self, what)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -82,18 +85,20 @@ class TestService(BaseTestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_persons_id_get(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.get(f'/persons/1')
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
             self.assertIn('person', data['data']['type'])
-            self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
+            self.assertIn(name.upper(), data['data']['attributes']['display_name'])
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_patch(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.patch(
@@ -116,10 +121,12 @@ class TestService(BaseTestCase):
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_tasks_patch(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = task_post(self)
+            what = 'do nothing'
+            response = task_post(self, what)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.patch(
@@ -152,7 +159,8 @@ class TestService(BaseTestCase):
             self.assertIn('1', data['data']['id'])
 
     def test_persons_id_delete(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.delete(f'/persons/1')
@@ -161,10 +169,12 @@ class TestService(BaseTestCase):
             self.assertIn('Object successfully deleted', data['meta']['message'])
 
     def test_persons_id_tasks_get(self):
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = task_post(self)
+            what = 'do nothing'
+            response = task_post(self, what)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -189,10 +199,11 @@ class TestService(BaseTestCase):
 
     def test_persons_id_tasks_post(self):
         with self.client:
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            self.assertIn('REN HOEK', data['data']['attributes']['display_name'])
+            self.assertIn(name.upper(), data['data']['attributes']['display_name'])
             response = self.client.post(
                 '/persons/1/tasks',
                 data=json.dumps({
@@ -211,10 +222,12 @@ class TestService(BaseTestCase):
 
     def test_persons_id_rel_tasks_get(self):
         with self.client:
-            response = person_post(self)
+            name = 'Ren Hoek'
+            response = person_post(self, name)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            response = task_post(self)
+            what = 'do nothing'
+            response = task_post(self, what)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
             response = self.client.post(
@@ -237,10 +250,11 @@ class TestService(BaseTestCase):
 
     def test_tasks_get(self):
         with self.client:
-            response = task_post(self)
+            what = 'do nothing'
+            response = task_post(self, what)
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            self.assertIn('do nothing', data['data']['attributes']['what'])
+            self.assertIn(what, data['data']['attributes']['what'])
 
 if __name__ == '__main__':
     unittest.main()
